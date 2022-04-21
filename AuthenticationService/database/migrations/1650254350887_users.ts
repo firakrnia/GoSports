@@ -1,5 +1,5 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
-import { cabor } from 'Contracts/enums'
+import { Cabor } from 'Contracts/enums'
 
 export default class UsersSchema extends BaseSchema {
   protected tableName = 'users'
@@ -10,7 +10,7 @@ export default class UsersSchema extends BaseSchema {
       table.string('nama', 255).notNullable()
       table.string('email', 255).notNullable().unique()
       table.string('password', 180).notNullable()
-      table.enum('cabor',Object.values(cabor)).notNullable()
+      table.enum('cabor',Object.values(Cabor)).notNullable()
       table.timestamps(true, true)
 
     })

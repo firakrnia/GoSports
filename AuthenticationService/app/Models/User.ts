@@ -1,10 +1,17 @@
 import { DateTime } from 'luxon'
 import Hash from '@ioc:Adonis/Core/Hash'
 import { column, beforeSave, BaseModel } from '@ioc:Adonis/Lucid/Orm'
+import { Cabor } from 'Contracts/enums'
 
 export default class User extends BaseModel {
   @column({ isPrimary: true })
   public id: number
+
+  @column()
+  public nama: string
+
+  @column()
+  public cabor: Cabor
 
   @column()
   public email: string

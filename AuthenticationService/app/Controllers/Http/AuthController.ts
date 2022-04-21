@@ -1,12 +1,13 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import User from 'App/Models/User';
-import { cabor } from 'Contracts/enums';
+import { Cabor } from 'Contracts/enums';
 
 export default class AuthController {
-    public async index({response}: HttpContextContract) {
+    public async index({request, response}: HttpContextContract) {
         try {
-            const user = await User.all()
+            const page = request.input('page', 1)
+            const user = await User.query().paginate(page, 50)
 
             return response.status(200).json({
                 success: true,
@@ -27,15 +28,14 @@ export default class AuthController {
                 rules.normalizeEmail({
                 allLowercase: true,
                 gmailRemoveSubaddress: true,
-  })
+    })
                 
             ]),
             password: schema.string({}, [
                 rules.minLength(6),
                 rules.confirmed('konfirmasi_password')
             ]),
-            cabor: schema.enum(Object.values(cabor))
-
+            cabor: schema.enum(Object.values(Cabor))
         })
         
         const validatedData = await request.validate({ schema: validationSchema })
@@ -63,7 +63,7 @@ export default class AuthController {
         
     }
     
-    public async logout( { response, auth}: HttpContextContract) {
+    public async logout( { response, auth }: HttpContextContract) {
         await auth.logout()
         
         return response.json({ message: 'Logout Berhasil'})
@@ -84,10 +84,41 @@ export default class AuthController {
         }
     }
 
-    public async update ({}: HttpContextContract) {
+    public async update ({ request, response, params}: HttpContextContract) {
+        try {
+            const user = await User.findByOrFail('id', params.id)
+
+            user.nama = request.input('nama')
+            user.cabor = request.input('cabor')
+            await user.save()
+        
+            return response.json({
+                success: true,
+                data: user
+        })
+        } catch (error) {
+            response.status(404).json({
+                message: error.message
+            })
+        }
+
     }
-  
-    public async destroy ({}: HttpContextContract) {
+
+    public async destroy ({ response, params }: HttpContextContract) {
+        try {
+            const user = await User.findByOrFail('id', params.id)
+
+            await user.delete()
+    
+            return response.json({
+                success: true,
+                data: user
+            })
+        } catch (error) {
+            response.status(404).json({
+                message: error.message
+            })
+        }
     }
 
 }
