@@ -6,9 +6,9 @@ export default class Pemains extends BaseSchema {
   public async up () {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id').primary()
-      table.string('posisi').nullable()
-      table.string('nomor_punggung').nullable()
-      table.integer('user_id').nullable()
+      table.string('posisi', 50).notNullable()
+      table.string('nomor_punggung', 3).notNullable()
+      table.integer('user_id').unsigned().notNullable()
       table.integer('tim_id').unsigned().references('id').inTable('tims').onDelete('CASCADE')
       table.timestamps(true, true)
     })

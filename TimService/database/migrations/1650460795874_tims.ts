@@ -6,12 +6,12 @@ export default class Tims extends BaseSchema {
   public async up () {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id').primary()
-      table.string('nama', 255).notNullable()
-      table.string('asal_instansi', 255).notNullable()
-      table.string('logo', 180).nullable()
-      table.integer('user_id').nullable()
+      table.string('nama', 150).notNullable()
+      table.string('asal_instansi', 100).notNullable()
+      table.text('deskripsi').nullable()
+      table.text('logo').nullable()
+      table.integer('user_id').unsigned().notNullable()
       table.timestamps(true, true)
-
     })
   }
 

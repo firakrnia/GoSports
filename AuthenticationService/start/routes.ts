@@ -19,5 +19,4 @@
 */
 
 import './routes/auth'
-import './routes/user'
 

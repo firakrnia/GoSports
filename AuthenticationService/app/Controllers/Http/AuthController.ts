@@ -4,8 +4,9 @@ import User from 'App/Models/User';
 import { Cabor } from 'Contracts/enums';
 
 export default class AuthController {
-    public async index({request, response}: HttpContextContract) {
+    public async index({request, response, auth}: HttpContextContract) {
         try {
+            await auth.authenticate()
             const page = request.input('page', 1)
             const user = await User.query().paginate(page, 50)
 
@@ -21,34 +22,39 @@ export default class AuthController {
     }
 
     public async register ({request, auth, response}: HttpContextContract){
-        const validationSchema = schema.create({
-            nama: schema.string(),
-            email: schema.string([
-                rules.email(),
-                rules.normalizeEmail({
-                allLowercase: true,
-                gmailRemoveSubaddress: true,
-    })
-                
-            ]),
-            password: schema.string({}, [
-                rules.minLength(6),
-                rules.confirmed('konfirmasi_password')
-            ]),
-            cabor: schema.enum(Object.values(Cabor))
+        try {
+            const validationSchema = schema.create({
+                nama: schema.string(),
+                email: schema.string([
+                    rules.email(),
+                    rules.normalizeEmail({
+                    allLowercase: true,
+                    gmailRemoveSubaddress: true,
         })
-        
-        const validatedData = await request.validate({ schema: validationSchema })
-
-        const user = await User.create(validatedData)
-
-        const resData = {
-            message: "Akun berhasil dibuat!",
-            data : user
+                    
+                ]),
+                password: schema.string({}, [
+                    rules.minLength(6),
+                    rules.confirmed('konfirmasi_password')
+                ]),
+                cabor: schema.enum(Object.values(Cabor))
+            })
+            
+            const validatedData = await request.validate({ schema: validationSchema })
+    
+            const user = await User.create(validatedData)
+    
+            const resData = {
+                message: "Akun berhasil dibuat!",
+                data : user
+            }
+            await auth.login(user)
+    
+            return response.status(201).json(resData) 
+        } catch (error) {
+            return response.badRequest(error)
         }
-        await auth.login(user)
-
-        return response.status(201).json(resData) 
+        
     }
 
     public async login({ request, response, auth }: HttpContextContract) {
@@ -84,8 +90,9 @@ export default class AuthController {
         }
     }
 
-    public async update ({ request, response, params}: HttpContextContract) {
+    public async update ({ request, response, params, auth}: HttpContextContract) {
         try {
+            await auth.authenticate()
             const user = await User.findByOrFail('id', params.id)
 
             user.nama = request.input('nama')
@@ -97,9 +104,10 @@ export default class AuthController {
                 data: user
         })
         } catch (error) {
-            response.status(404).json({
-                message: error.message
-            })
+            // response.status(404).json({
+            //     message: error.message
+            // })
+            console.log(error)
         }
 
     }
