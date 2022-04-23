@@ -10,10 +10,7 @@ export default class AuthController {
             const page = request.input('page', 1)
             const user = await User.query().paginate(page, 50)
 
-            return response.status(200).json({
-                success: true,
-                data: user
-            })
+            return response.status(200).json(user)
         } catch (error) {
             return response.status(404).json({
                 message: error.message
@@ -80,7 +77,7 @@ export default class AuthController {
             const user = await User.findOrFail(params.id)
 
             return response.status(200).json({
-                success: true,
+                msg: true,
                 data: user
             })
         } catch (error) {
@@ -104,10 +101,10 @@ export default class AuthController {
                 data: user
         })
         } catch (error) {
-            // response.status(404).json({
-            //     message: error.message
-            // })
-            console.log(error)
+            response.status(404).json({
+                message: error.message
+            })
+            // console.log(error)
         }
 
     }

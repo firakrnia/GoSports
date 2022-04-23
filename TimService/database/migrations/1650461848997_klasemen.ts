@@ -6,11 +6,11 @@ export default class Klasemen extends BaseSchema {
   public async up () {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id').primary()
-      table.string('bermain').notNullable()
-      table.string('menang').notNullable()
-      table.string('kalah').notNullable()
-      table.string('seri').notNullable()
-      table.string('poin').notNullable()
+      table.integer('bermain').notNullable()
+      table.integer('menang').notNullable()
+      table.integer('kalah').notNullable()
+      table.integer('seri').notNullable()
+      table.integer('poin').notNullable()
       table.integer('tim_id').unsigned().references('id').inTable('tims').onDelete('CASCADE')
       table.timestamps(true, true)
     })

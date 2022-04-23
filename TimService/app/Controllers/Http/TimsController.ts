@@ -1,22 +1,109 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import Application from '@ioc:Adonis/Core/Application'
 import Tim from 'App/Models/Tim'
 
 export default class TimsController {
-    public async index({ request, response, auth }: HttpContextContract) {
+    public async index({ request, response }: HttpContextContract) {
         try {
-            await auth.authenticate()
-            const page = request.input()
-            const tims = Tim.query().paginate()
+            const page = request.input('page', 1)
+            const tims = await Tim.query().paginate(page)
+
+            return response.status(200).json(tims)
         } catch (error) {
-            
+            return response.status(404).json({
+                message: error.message
+            })
         }
     }
 
-    public async store({}: HttpContextContract) {}
+    public async store({request, response}: HttpContextContract) {
+        try {
+            const tim = new Tim()
+            const logoTim = request.file('logo', {
+                    size: '2mb',
+                    extnames: ['jpg', 'gif', 'png'],
+                }
+            )
+            
+            await logoTim?.move(Application.publicPath('foto/logoTim'))
+            const logo = `${logoTim?.fileName?.toLowerCase()}-${new Date().getTime().toString()}.${logoTim?.extname}`
+            tim.nama = request.input('nama')
+            tim.asalInstansi = request.input('asalInstansi')
+            tim.deskripsi = request.input('deskripsi')
+            tim.logo = `foto/logoTim/${logo}`
+            
+            await tim.save()
 
-    public async show({}: HttpContextContract) {}
+            return response.status(201).json({
+                message: 'berhasil',
+                data: tim
+            })
+        } catch (error) {
+            return response.status(404).json({
+                message: error.message
+            })
+        }
+    }
 
-    public async update({}: HttpContextContract) {}
+    public async show({response, params}: HttpContextContract) {
+        try {
+            const tim = await Tim.findOrFail(params.id)
 
-    public async destroy({}: HttpContextContract) {}
+            return response.status(200).json({
+                success: true,
+                data: tim
+            })
+        } catch (error) {
+            return response.status(404).json({
+                message: error.message
+            })
+        }
+    }
+
+    public async update({request, response, params}: HttpContextContract) {
+        try {
+            const tim = await Tim.findByOrFail('id', params.id)
+            const logoTim = request.file('logo', {
+                size: '2mb',
+                extnames: ['jpg', 'gif', 'png'],
+            }
+            )
+            
+            await logoTim?.move(Application.publicPath('foto/logoTim'))
+            const logo = `${logoTim?.fileName?.toLowerCase()}-${new Date().getTime().toString()}.${logoTim?.extname}`
+            tim.nama = request.input('nama')
+            tim.asalInstansi = request.input('asalInstansi')
+            tim.deskripsi = request.input('deskripsi')
+            tim.logo = `foto/logoTim/${logo}`
+        
+            await tim.save()
+
+            return response.status(200).json({
+                success: true,
+                data: tim
+            })
+        } catch (error) {
+            return response.status(404).json({
+                message: error.message
+            })
+        }
+    }
+
+    public async destroy({response, params}: HttpContextContract) {
+        try {
+            const tim = await Tim.findByOrFail('id', params.id)
+
+            await tim.delete()
+
+            return response.status(200).json({
+                success: true,
+                data: tim
+            })
+
+        } catch (error) {
+            return response.status(404).json({
+                message: error.message
+            })
+        }
+    }
 }

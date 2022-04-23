@@ -5,6 +5,18 @@ export default class Pemain extends BaseModel {
   @column({ isPrimary: true })
   public id: number
 
+  @column()
+  public posisi: string
+
+  @column()
+  public nomorPunggung: string
+  
+  @column()
+  public userId: number
+  
+  @column()
+  public timId: number
+  
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 
