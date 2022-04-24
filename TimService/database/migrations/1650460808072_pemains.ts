@@ -8,6 +8,7 @@ export default class Pemains extends BaseSchema {
       table.increments('id').primary()
       table.string('posisi', 50).notNullable()
       table.string('nomor_punggung', 3).notNullable()
+      table.text('foto').nullable()
       table.integer('user_id').unsigned().notNullable()
       table.integer('tim_id').unsigned().references('id').inTable('tims').onDelete('CASCADE')
       table.timestamps(true, true)

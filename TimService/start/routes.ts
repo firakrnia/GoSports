@@ -19,3 +19,4 @@
 */
 
 import './routes/tim'
+import './routes/pemain'

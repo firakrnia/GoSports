@@ -6,7 +6,7 @@ export default class TimsController {
     public async index({ request, response }: HttpContextContract) {
         try {
             const page = request.input('page', 1)
-            const tims = await Tim.query().paginate(page)
+            const tims = await Tim.query().paginate(page, 50)
 
             return response.status(200).json(tims)
         } catch (error) {
@@ -16,20 +16,21 @@ export default class TimsController {
         }
     }
 
-    public async store({request, response}: HttpContextContract) {
+    public async store({request, response, params}: HttpContextContract) {
         try {
             const tim = new Tim()
             const logoTim = request.file('logo', {
                     size: '2mb',
-                    extnames: ['jpg', 'gif', 'png'],
+                    extnames: ['jpg', 'png', 'jpeg', 'svg'],
                 }
             )
             
             await logoTim?.move(Application.publicPath('foto/logoTim'))
             const logo = `${logoTim?.fileName?.toLowerCase()}-${new Date().getTime().toString()}.${logoTim?.extname}`
-            tim.nama = request.input('nama')
-            tim.asalInstansi = request.input('asalInstansi')
+            tim.nama = request.input('nama_tim')
+            tim.asalInstansi = request.input('asal_instansi')
             tim.deskripsi = request.input('deskripsi')
+            tim.userId = params.userId
             tim.logo = `foto/logoTim/${logo}`
             
             await tim.save()
@@ -47,7 +48,7 @@ export default class TimsController {
 
     public async show({response, params}: HttpContextContract) {
         try {
-            const tim = await Tim.findOrFail(params.id)
+            const tim = await Tim.query().where('id', params.id).preload('pemains')
 
             return response.status(200).json({
                 success: true,
