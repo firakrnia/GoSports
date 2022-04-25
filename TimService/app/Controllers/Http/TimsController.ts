@@ -16,7 +16,7 @@ export default class TimsController {
         }
     }
 
-    public async store({request, response, params}: HttpContextContract) {
+    public async store({request, response}: HttpContextContract) {
         try {
             const tim = new Tim()
             const logoTim = request.file('logo', {
@@ -26,11 +26,13 @@ export default class TimsController {
             )
             
             await logoTim?.move(Application.publicPath('foto/logoTim'))
+
             const logo = `${logoTim?.fileName?.toLowerCase()}-${new Date().getTime().toString()}.${logoTim?.extname}`
+            
             tim.nama = request.input('nama_tim')
             tim.asalInstansi = request.input('asal_instansi')
             tim.deskripsi = request.input('deskripsi')
-            tim.userId = params.userId
+            tim.userId = request.input('userId')
             tim.logo = `foto/logoTim/${logo}`
             
             await tim.save()

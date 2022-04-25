@@ -19,7 +19,7 @@ export default class PemainsController {
     public async store({ request, response, params }: HttpContextContract) {
         try {
             const pemain = new Pemain()
-            const input = request.only(['posisi', 'nomor_punggung'])
+            const input = request.only(['posisi', 'nomor_punggung', 'userId'])
             const foto = request.file('foto',{
                 size: '2mb',
                 extnames: ['jpg', 'png', 'jpeg', 'svg'],
@@ -30,7 +30,7 @@ export default class PemainsController {
 
             pemain.posisi = input.posisi
             pemain.nomorPunggung = input.nomor_punggung
-            pemain.userId = params.userId
+            pemain.userId = input.userId
             pemain.timId = params.timId
             pemain.foto = `foto/fotoPemain/${fotoPemain}`
 
@@ -65,7 +65,7 @@ export default class PemainsController {
     public async update({ request, response, params }: HttpContextContract) {
         try {
             const pemain = await Pemain.findByOrFail('id', params.id)
-            const input = request.only(['posisi', 'nomor_punggung'])
+            const input = request.only(['posisi', 'nomor_punggung', 'userId'])
             const foto = request.file('foto',{
                 size: '2mb',
                 extnames: ['jpg', 'png', 'jpeg', 'svg'],
@@ -76,8 +76,6 @@ export default class PemainsController {
 
             pemain.posisi = input.posisi
             pemain.nomorPunggung = input.nomor_punggung
-            pemain.userId = params.userId
-            pemain.timId = params.timId
             pemain.foto = `foto/fotoPemain/${fotoPemain}`
 
             await pemain.save()
